@@ -59,4 +59,20 @@ function M.convert_file(from, to, input_path, output_path)
   return nil, nil
 end
 
+--- Run a binary inspection operation on a file path.
+--- Calls: atob <filepath> <operation>
+--- Returns (output_string, nil) on success, (nil, error_string) on failure.
+---@param filepath  string  absolute path to the file
+---@param operation string  "inspect", "hexdump", or "strings"
+---@return string|nil, string|nil
+function M.inspect_file(filepath, operation)
+  local cmd = { binary(), filepath, operation }
+  local result = vim.system(cmd, { text = true }):wait()
+  if result.code ~= 0 then
+    local err = (result.stderr and result.stderr ~= '') and result.stderr or 'inspection failed'
+    return nil, vim.trim(err)
+  end
+  return result.stdout, nil
+end
+
 return M
